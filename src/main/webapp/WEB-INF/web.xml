@@ -64,7 +64,10 @@
 		<servlet-name>XlsxServlet</servlet-name>
 		<servlet-class>net.sf.jasperreports.j2ee.servlets.XlsxServlet</servlet-class>
 	</servlet>
-
+	<servlet>
+		<servlet-name>DocGenServlet</servlet-name>
+		<servlet-class>servlets.DocGenServlet</servlet-class>
+	</servlet>
 
 	<servlet-mapping>
 		<servlet-name>CompileServlet</servlet-name>
@@ -125,6 +128,15 @@
 	<servlet-mapping>
 		<servlet-name>XlsxServlet</servlet-name>
 		<url-pattern>/servlets/xlsx</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>DocGenServlet</servlet-name>
+		<url-pattern>/docGen</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>DocGenServlet</servlet-name>
+		<url-pattern>/docGen/*</url-pattern>
 	</servlet-mapping>
 
 	<welcome-file-list>

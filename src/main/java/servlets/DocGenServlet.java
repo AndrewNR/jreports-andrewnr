@@ -3,11 +3,16 @@ package servlets;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Map;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import net.sf.jasperreports.engine.JRConstants;
 import net.sf.jasperreports.engine.JRDataSource;
@@ -19,6 +24,26 @@ import net.sf.jasperreports.engine.JasperFillManager;
 public class DocGenServlet extends HttpServlet {
 
     private static final long serialVersionUID = JRConstants.SERIAL_VERSION_UID;
+    
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // TODO: write generated report file byte[] array to response outputStream.
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+        
+        out.println("<html>");
+        out.println("<head>");
+        out.println("<title>JasperReports - DocGen Servlet</title>");
+        out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"../stylesheet.css\" title=\"Style\">");
+        out.println("</head>");
+        
+        out.println("<body bgcolor=\"white\">");
+
+        out.println("<span class=\"bold\">STUB: this servlet will generate resulting file from JasperReport using SFDC data.</span>");
+
+        out.println("</body>");
+        out.println("</html>");
+    }
     
     public static void checks() {
         try {
