@@ -3,7 +3,6 @@ package org.andrewnr.oauth;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,7 +54,8 @@ public class AttachmentServlet extends HttpServlet {
 		) );
         DescribeSObjectResult describeSObject = connection.describeSObject("Attachment");
         Set<String> objFields = getObjectFieldNames(describeSObject);
-        List<String> availableFields = collectAvailableFields(objFields, neededFields);
+//        List<String> availableFields = collectAvailableFields(objFields, neededFields);
+        List<String> availableFields = new ArrayList<String>(neededFields);
         log.info("availableFields: " + availableFields.toString());
         String availableFieldsQueryClause = StringUtils.join(availableFields, ", ");
         String soqlQuery = new StringBuilder()
