@@ -63,7 +63,7 @@ public class AttachmentServlet extends HttpServlet {
 //                	.append("Id, Name, Description, ContentType, BodyLength, Body, ")
 //                	.append("LastModifiedDate, LastModifiedById, ")
 //                	.append("IsPrivate, IsDeleted ")
-                	.append(availableFieldsQueryClause)
+                	.append(availableFieldsQueryClause).append(" ")
                 .append("from Attachment ")
                 .append("where id ='").append(parentId).append("' or ParentId = '").append(parentId).append("' ")
                 .append("limit 500 ")
