@@ -48,12 +48,12 @@ public class AttachmentServlet extends HttpServlet {
     private SObject[] queryAttachments(String parentId) throws ConnectionException {
         PartnerConnection connection = ConnectionManager.getConnectionManager().getConnection();
         Set<String> neededFields = new HashSet<String>( Arrays.asList(
-        		"Id", "Name", "Body", "BodyLength"
-//        		,"ContentType", "LastModifiedDate", "LastModifiedById"
-//        		,"IsPrivate", "IsDeleted", "ParentId"
+        		"Id", "Name", "BodyLength"
+//        		, "Body", "ContentType", "LastModifiedDate", "LastModifiedById"
+//        		, "IsPrivate", "IsDeleted", "ParentId"
 		) );
-        DescribeSObjectResult describeSObject = connection.describeSObject("Attachment");
-        Set<String> objFields = getObjectFieldNames(describeSObject);
+//        DescribeSObjectResult describeSObject = connection.describeSObject("Attachment");
+//        Set<String> objFields = getObjectFieldNames(describeSObject);
 //        List<String> availableFields = collectAvailableFields(objFields, neededFields);
         List<String> availableFields = new ArrayList<String>(neededFields);
         log.info("availableFields: " + availableFields.toString());
