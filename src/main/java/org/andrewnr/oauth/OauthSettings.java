@@ -26,9 +26,9 @@ public class OauthSettings {
     public static String CONSUMER_SECRET;
 
     // URLs used by the application
-    public static String URL_API_LOGIN = HOST + "/services/OAuth/c/29.0";
+    public static String URL_API_LOGIN = HOST + "/services/OAuth/c/27.0";
     public static String URL_AUTHORIZATION = HOST + "/setup/secur/RemoteAccessAuthorizationPage.apexp";
-    public static String URL_AUTH_ENDPOINT = HOST + "/services/Soap/u/29.0";
+    public static String URL_AUTH_ENDPOINT = HOST + "/services/Soap/u/27.0";
     public static String URL_REQUEST_TOKEN = HOST + "/_nc_external/system/security/oauth/RequestTokenHandler";
     public static String URL_ACCESS_TOKEN = HOST + "/_nc_external/system/security/oauth/AccessTokenHandler";
 
