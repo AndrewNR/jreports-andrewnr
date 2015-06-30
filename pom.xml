@@ -15,6 +15,26 @@
 	<scope>provided</scope>
 </dependency>
 
+<dependency>
+	<groupId>net.oauth.core</groupId>
+	<artifactId>oauth</artifactId>
+	<version>20100527</version>
+</dependency>
+
+<dependency>
+	<groupId>com.force.api</groupId>
+	<artifactId>force-wsc</artifactId>
+	<version>22.0.0</version>
+</dependency>
+<!-- local libs to include into classpath -->
+<dependency>
+    <groupId>partner-library</groupId>
+    <artifactId>com.salesforce</artifactId>
+    <version>1.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/partner-library.jar</systemPath>
+</dependency>
+
 <!-- Dependencies copied from JasperReports example webapp -->
 <dependency>
 	<groupId>commons-beanutils</groupId>
