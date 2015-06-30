@@ -40,14 +40,14 @@ public class AttachmentServlet extends HttpServlet {
     private SObject[] queryAttachments(String parentId) throws ConnectionException {
         PartnerConnection connection = ConnectionManager.getConnectionManager().getConnection();
         String soqlQuery = new StringBuilder()
-                .append("select a.Id, a.Name, a.Description, a.ContentType, a.BodyLength, a.Body,")
-                .append("a.SystemModstamp, a.ParentId, a.OwnerId,")
-                .append("a.LastModifiedDate, a.LastModifiedById,")
-                .append("a.CreatedDate, a.CreatedById,")
-                .append("a.IsPrivate, a.IsDeleted")
-                .append("from Attachment a ")
-                .append("where a.id ='").append(parentId).append("' or a.ParentId = '").append(parentId).append("'")
-                .append("limit 500")
+                .append("select Id, Name, Description, ContentType, BodyLength, Body, ")
+                .append("SystemModstamp, ParentId, OwnerId, ")
+                .append("LastModifiedDate, LastModifiedById, ")
+                .append("CreatedDate, CreatedById, ")
+                .append("IsPrivate, IsDeleted ")
+                .append("from Attachment ")
+                .append("where id ='").append(parentId).append("' or ParentId = '").append(parentId).append("' ")
+                .append("limit 500 ")
                 .toString();
         QueryResult results = connection.query(soqlQuery);
         SObject[] records = results.getRecords();
