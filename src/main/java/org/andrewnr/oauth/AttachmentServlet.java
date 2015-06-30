@@ -1,4 +1,4 @@
-package servlets;
+package org.andrewnr.oauth;
 
 import java.io.IOException;
 import java.util.logging.Logger;
