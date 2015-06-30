@@ -41,9 +41,7 @@ public class AttachmentServlet extends HttpServlet {
         PartnerConnection connection = ConnectionManager.getConnectionManager().getConnection();
         String soqlQuery = new StringBuilder()
                 .append("select Id, Name, Description, ContentType, BodyLength, Body, ")
-                .append("SystemModstamp, ParentId, OwnerId, ")
                 .append("LastModifiedDate, LastModifiedById, ")
-                .append("CreatedDate, CreatedById, ")
                 .append("IsPrivate, IsDeleted ")
                 .append("from Attachment ")
                 .append("where id ='").append(parentId).append("' or ParentId = '").append(parentId).append("' ")
