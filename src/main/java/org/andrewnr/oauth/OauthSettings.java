@@ -40,7 +40,7 @@ public class OauthSettings {
     public static void initConfig() {
         Map<String, String> configValues = new HashMap<String, String>();
         configValues.put(ENV_HOST, "https://login.salesforce.com");
-        configValues.put(ENV_OAUTH_URL_CALLBACK, "https://andrewnr-heroku-oauth.herokuapp.com/callback");
+        configValues.put(ENV_OAUTH_URL_CALLBACK, "https://jreports-andrewnr.herokuapp.com/callback");
         configValues.put(ENV_OAUTH_CONSUMER_KEY, "3MVG9A2kN3Bn17hszKpKA8xWHsPmGWw6gSsTwftwvAZUgrU8XqN3LjRdPwrAM5D2Mep_C9Q4LqH8Ux5BXpz3T");
         configValues.put(ENV_OAUTH_CONSUMER_SECRET, "8542237700479489045");
         
