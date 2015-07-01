@@ -130,7 +130,10 @@ public class AttachmentServlet extends HttpServlet {
                 log.info("URL: " + docGenProcessStreamUrl);
                 HttpURLConnection con = (HttpURLConnection) new URL(docGenProcessStreamUrl).openConnection();
                 con.setRequestMethod("POST");
+                con.setReadTimeout(30*1000);
                 con.setDoOutput(true);
+                con.connect();
+                
                 conOutput = con.getOutputStream();
                 conOutput.write(bodyBytes);
                 log.info("attachment bodyBytes written to URLConnection...");
