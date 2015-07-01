@@ -76,9 +76,9 @@ public class CallbackServlet extends HttpServlet {
             serviceEndpoint, sessionId);
       }
 
-      RequestDispatcher rd = req.getRequestDispatcher("home");
-      rd.forward(req, resp);
-
+//      RequestDispatcher rd = req.getRequestDispatcher("/home");
+//      rd.forward(req, resp);
+      resp.sendRedirect("/home");
     } catch (Exception e) {
       log.info("Callback servlet exception=" + e.toString());
     }
