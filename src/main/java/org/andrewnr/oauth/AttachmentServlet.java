@@ -20,6 +20,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.DatatypeConverter;
 
 import net.sf.jasperreports.engine.util.JRStringUtil;
 
@@ -107,9 +108,10 @@ public class AttachmentServlet extends HttpServlet {
 
             out.println("<span class=\"bold\">Attachment content preview for Id: " + attachmentObj.getId() + "</span>");
 
-            String bodyData = (String) attachmentObj.getField("Body");
-            log.info(bodyData != null ? "Attachment.Body.length: " + bodyData.length() : "Attachment.Body is null");
-            InputStream is = new ByteArrayInputStream(bodyData.getBytes(StandardCharsets.UTF_8));
+            String bodyDataBase64 = (String) attachmentObj.getField("Body");
+            byte[] bodyData = DatatypeConverter.parseBase64Binary(bodyDataBase64);
+            log.info(bodyData != null ? "Attachment.Body.length: " + bodyData.length : "Attachment.Body is null");
+            InputStream is = new ByteArrayInputStream(bodyData);
             InputStreamReader reader = new InputStreamReader(is);
             try {
                 out.println("<pre id='content'>");
