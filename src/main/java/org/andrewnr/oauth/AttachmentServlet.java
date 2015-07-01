@@ -121,26 +121,48 @@ public class AttachmentServlet extends HttpServlet {
         }
     }
     
-    private void sendReportToDocGen(byte[] bodyBytes, HttpServletRequest req) throws MalformedURLException, IOException {
+    private void sendReportToDocGen(byte[] bodyBytes, HttpServletRequest req, HttpServletResponse resp) throws MalformedURLException, IOException {
         log.info("----> sendReportToDocGen() start");
         if (bodyBytes != null && req != null) {
             OutputStream conOutput = null;
+            HttpURLConnection con = null;
             try {
                 String docGenProcessStreamUrl = new StringBuilder("https://").append(req.getServerName()).append("/docGen/processStream").toString();
                 log.info("URL: " + docGenProcessStreamUrl);
-                HttpURLConnection con = (HttpURLConnection) new URL(docGenProcessStreamUrl).openConnection();
+                
+                log.info("Building HttpURLConnection...");
+                con = (HttpURLConnection) new URL(docGenProcessStreamUrl).openConnection();
                 con.setRequestMethod("POST");
                 con.setReadTimeout(30*1000);
                 con.setDoOutput(true);
+                con.setDoInput(true);
                 con.connect();
                 
+                // send request
+                log.info("Sending request to HttpURLConnection...");
                 conOutput = con.getOutputStream();
                 conOutput.write(bodyBytes);
                 log.info("attachment bodyBytes written to URLConnection...");
                 conOutput.flush();
                 log.info("URLConnection outputStream flushed...");
+                
+                
+                // get response
+                log.info("Getting response from HttpURLConnection...");
+                InputStream is = con.getInputStream();
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+                ServletOutputStream out = resp.getOutputStream();
+                String line;
+                while ((line = rd.readLine()) != null) {
+                    out.println(line);
+                }
+                rd.close();
+                out.flush();
             } finally {
                 IOUtils.closeQuietly(conOutput);
+                if (con != null) {
+                    con.disconnect();
+                }
             }
         }
         log.info("----> sendReportToDocGen() complete");
