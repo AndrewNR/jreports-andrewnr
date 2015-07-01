@@ -53,11 +53,6 @@
 				<box>
 					<topPen lineWidth="1.0"/>
 				</box>
-				<image scaleImage="Clip" hyperlinkType="Reference">
-					<reportElement x="5" y="5" width="165" height="40" uuid="d8d5c5a9-267f-4992-b824-bf5e4f703441"/>
-					<imageExpression><![CDATA[new File($P{BaseDir}, "../images/jasperreports.png")]]></imageExpression>
-					<hyperlinkReferenceExpression><![CDATA["http://jasperreports.sourceforge.net"]]></hyperlinkReferenceExpression>
-				</image>
 				<textField isBlankWhenNull="true">
 					<reportElement x="175" y="5" width="335" height="40" uuid="bb74781c-1c03-4044-87f6-e43bfaf5a15a"/>
 					<textElement textAlignment="Right">

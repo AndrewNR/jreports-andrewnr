@@ -88,6 +88,7 @@ public class DocGenServlet extends HttpServlet {
         out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"../stylesheet.css\" title=\"Style\">");
         out.println("</head>");
         out.println("<body bgcolor=\"white\">");
+        out.println("<div>Generated JasperReport HTML</div>");
         
         InputStream jrxmlInputStream = null;
         try {
