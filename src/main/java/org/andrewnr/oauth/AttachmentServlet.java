@@ -5,6 +5,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -105,9 +107,9 @@ public class AttachmentServlet extends HttpServlet {
 
             out.println("<span class=\"bold\">Attachment content preview for Id: " + attachmentObj.getId() + "</span>");
 
-            byte[] bodyData = (byte[]) attachmentObj.getField("Body");
-            log.info(bodyData != null ? "Attachment.Body.length: " + bodyData.length : "Attachment.Body is null");
-            InputStream is = new ByteArrayInputStream(bodyData);
+            String bodyData = (String) attachmentObj.getField("Body");
+            log.info(bodyData != null ? "Attachment.Body.length: " + bodyData.length() : "Attachment.Body is null");
+            InputStream is = new ByteArrayInputStream(bodyData.getBytes(StandardCharsets.UTF_8));
             InputStreamReader reader = new InputStreamReader(is);
             try {
                 out.println("<pre id='content'>");
