@@ -78,6 +78,8 @@ public class DocGenServlet extends HttpServlet {
     }
     
     private void processStream(HttpServletRequest req, HttpServletResponse resp) throws IOException, JRException {
+        log.info("----> processStream() start");
+        
         resp.setContentType("text/html");
         ServletOutputStream out = resp.getOutputStream();
         out.println("<html>");
@@ -90,9 +92,13 @@ public class DocGenServlet extends HttpServlet {
         InputStream jrxmlInputStream = null;
         try {
             jrxmlInputStream = new BufferedInputStream(req.getInputStream());
+            log.info("jrxmlInputStream read from request inputStream...");
             JasperReport compiledReport = JasperCompileManager.compileReport(jrxmlInputStream);
+            log.info("report compiled from jrxmlInputStream...");
             JasperPrint fillReport = JasperFillManager.fillReport(compiledReport, getReportParams(), getReportDataSource());
-            JasperExportManager.exportReportToPdfStream(fillReport, resp.getOutputStream());
+            log.info("report filled ...");
+            exportReportToHtml(fillReport, req, resp);
+            log.info("report exported as HTML into response...");
         } finally {
             IOUtils.closeQuietly(jrxmlInputStream);
         }
@@ -100,12 +106,14 @@ public class DocGenServlet extends HttpServlet {
         out.println("</body>");
         out.println("</html>");
         out.flush();
+        
+        log.info("----> processStream() start");
     }
 
-    private void exportReportToHtml(OutputStream filledReportOutputStream, HttpServletRequest req, HttpServletResponse resp) throws IOException, JRException {
+    private void exportReportToHtml(JasperPrint jasperPrint, HttpServletRequest req, HttpServletResponse resp) throws IOException, JRException {
         HtmlExporter exporter = new HtmlExporter();
-        req.getSession().setAttribute(ImageServlet.DEFAULT_JASPER_PRINT_SESSION_ATTRIBUTE, filledReportOutputStream);
-        exporter.setExporterInput(new SimpleExporterInput( outputToInputStream(filledReportOutputStream) ));
+        req.getSession().setAttribute(ImageServlet.DEFAULT_JASPER_PRINT_SESSION_ATTRIBUTE, jasperPrint);
+        exporter.setExporterInput(new SimpleExporterInput( jasperPrint ));
         SimpleHtmlExporterOutput output = new SimpleHtmlExporterOutput(resp.getOutputStream());
         output.setImageHandler(new WebHtmlResourceHandler("image?image={0}"));
         exporter.setExporterOutput(output);
