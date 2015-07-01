@@ -40,11 +40,13 @@ public class AttachmentServlet extends HttpServlet {
         String pathInfo = req.getPathInfo();
         log.info("pathInfo: " + pathInfo);
         try {
-            if (pathInfo == null) {
-                listAttachments(req, resp);
-            } else if (pathInfo.endsWith("/showContent")) {
-                showContent(req, resp);
+            if (pathInfo != null && pathInfo.endsWith("/viewContent")) {
+                viewContent(req, resp);
+                return;
             }
+            
+            //default action
+            listAttachments(req, resp);
         } catch (ServletException e) {
             log.severe("Servlet exception=" + e.toString());
         } catch (Exception e) {
@@ -66,8 +68,8 @@ public class AttachmentServlet extends HttpServlet {
         dispatcher.forward(req, resp);
     }
 
-    private void showContent(HttpServletRequest req, HttpServletResponse resp) throws ConnectionException, IOException {
-        log.info("----> showContent() action");
+    private void viewContent(HttpServletRequest req, HttpServletResponse resp) throws ConnectionException, IOException {
+        log.info("----> viewContent() action");
         String attachmentId = req.getParameter("id");
         log.info("attachmentId: " + attachmentId);
         if (attachmentId != null && !attachmentId.isEmpty()) {
