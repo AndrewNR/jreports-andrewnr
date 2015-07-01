@@ -117,7 +117,7 @@ public class AttachmentServlet extends HttpServlet {
             SObject attachmentObj = findAttachmentById(attachments, attachmentId);
             log.info("attachmentObj != null ? " + (attachmentObj != null));
             byte[] bodyBytes = getAttachmentBodyBytes(attachmentObj);
-            sendReportToDocGen(bodyBytes, req);
+            sendReportToDocGen(bodyBytes, req, resp);
         }
     }
     
