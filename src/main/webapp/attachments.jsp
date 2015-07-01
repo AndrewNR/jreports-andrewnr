@@ -14,8 +14,8 @@
     <ol>
     <% for (SObject attachment : attachments) { %>
         <li>Id: <%=(String)attachment.getField("Id")%>,
-        Name: <%= (String)attachment.getField("Name") %>,
-        Description: <%= (String)attachment.getField("Description") %></li>
+        Name: <%= (String)attachment.getField("Name") %>.
+        <a href="/attachments/viewContent?id=<%=(String)attachment.getField("Id")%>" target="_blank">view content</a></li>
     <% } %>
     </ol>
 <% } %>
