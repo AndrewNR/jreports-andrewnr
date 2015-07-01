@@ -115,14 +115,15 @@ public class AttachmentServlet extends HttpServlet {
             SObject attachmentObj = findAttachmentById(attachments, attachmentId);
             log.info("attachmentObj != null ? " + (attachmentObj != null));
             byte[] bodyBytes = getAttachmentBodyBytes(attachmentObj);
-            sendReportToDocGen(bodyBytes);
+            sendReportToDocGen(bodyBytes, req);
         }
     }
     
-    private void sendReportToDocGen(byte[] bodyBytes) throws MalformedURLException, IOException {
+    private void sendReportToDocGen(byte[] bodyBytes, HttpServletRequest req) throws MalformedURLException, IOException {
         OutputStream conOutput = null;
         try {
-            URLConnection con = new URL("/DocGen/processStream").openConnection();
+            String docGenProcessStreamUrl = new StringBuilder("https://").append(req.getServerName()).append("/DocGen/processStream").toString();
+            URLConnection con = new URL(docGenProcessStreamUrl).openConnection();
             con.setDoOutput(true);
             conOutput = con.getOutputStream();
             conOutput.write(bodyBytes);
