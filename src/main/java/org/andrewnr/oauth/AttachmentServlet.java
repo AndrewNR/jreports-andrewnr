@@ -37,11 +37,12 @@ public class AttachmentServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String contextPath = req.getContextPath();
+        String pathInfo = req.getPathInfo();
+        log.info("pathInfo: " + pathInfo);
         try {
-            if (contextPath == null || contextPath.endsWith("/attachments") || contextPath.endsWith("/attachments/")) {
+            if (pathInfo == null) {
                 listAttachments(req, resp);
-            } else if (contextPath.endsWith("/attachments/showContent")) {
+            } else if (pathInfo.endsWith("/showContent")) {
                 showContent(req, resp);
             }
         } catch (ServletException e) {

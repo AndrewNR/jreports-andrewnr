@@ -186,10 +186,6 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>AttachmentServlet</servlet-name>
-		<url-pattern>/attachments</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>AttachmentServlet</servlet-name>
 		<url-pattern>/attachments/*</url-pattern>
 	</servlet-mapping>
 
