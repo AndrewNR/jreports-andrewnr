@@ -126,7 +126,7 @@ public class AttachmentServlet extends HttpServlet {
         if (bodyBytes != null && req != null) {
             OutputStream conOutput = null;
             try {
-                String docGenProcessStreamUrl = new StringBuilder("https://").append(req.getServerName()).append("/DocGen/processStream").toString();
+                String docGenProcessStreamUrl = new StringBuilder("https://").append(req.getServerName()).append("/docGen/processStream").toString();
                 log.info("URL: " + docGenProcessStreamUrl);
                 HttpURLConnection con = (HttpURLConnection) new URL(docGenProcessStreamUrl).openConnection();
                 con.setRequestMethod("POST");
