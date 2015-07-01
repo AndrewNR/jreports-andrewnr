@@ -1,5 +1,6 @@
 package org.andrewnr.oauth;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -120,17 +121,24 @@ public class AttachmentServlet extends HttpServlet {
     }
     
     private void sendReportToDocGen(byte[] bodyBytes, HttpServletRequest req) throws MalformedURLException, IOException {
-        OutputStream conOutput = null;
-        try {
-            String docGenProcessStreamUrl = new StringBuilder("https://").append(req.getServerName()).append("/DocGen/processStream").toString();
-            URLConnection con = new URL(docGenProcessStreamUrl).openConnection();
-            con.setDoOutput(true);
-            conOutput = con.getOutputStream();
-            conOutput.write(bodyBytes);
-            conOutput.flush();
-        } finally {
-            IOUtils.closeQuietly(conOutput);
+        log.info("----> sendReportToDocGen() start");
+        if (bodyBytes != null && req != null) {
+            OutputStream conOutput = null;
+            try {
+                String docGenProcessStreamUrl = new StringBuilder("https://").append(req.getServerName()).append("/DocGen/processStream").toString();
+                log.info("URL: " + docGenProcessStreamUrl);
+                URLConnection con = new URL(docGenProcessStreamUrl).openConnection();
+                con.setDoOutput(true);
+                conOutput = con.getOutputStream();
+                conOutput.write(bodyBytes);
+                log.info("attachment bodyBytes written to URLConnection...");
+                conOutput.flush();
+                log.info("URLConnection outputStream flushed...");
+            } finally {
+                IOUtils.closeQuietly(conOutput);
+            }
         }
+        log.info("----> sendReportToDocGen() complete");
     }
 
     private void printAttachmentBodyToResponse(byte[] bodyBytes, HttpServletResponse resp) throws IOException {
