@@ -54,7 +54,9 @@ public class AttachmentServlet extends HttpServlet {
 
     private void listAttachments(HttpServletRequest req, HttpServletResponse resp) throws ConnectionException,
             ServletException, IOException {
+        log.info("----> listAttachments() action");
         String parentId = req.getParameter("parentId");
+        log.info("parentId: " + parentId);
         if (parentId == null) {
             throw new RuntimeException("No request parameter found: parentId");
         }
@@ -65,13 +67,17 @@ public class AttachmentServlet extends HttpServlet {
     }
 
     private void showContent(HttpServletRequest req, HttpServletResponse resp) throws ConnectionException, IOException {
+        log.info("----> showContent() action");
         String attachmentId = req.getParameter("id");
+        log.info("attachmentId: " + attachmentId);
         if (attachmentId != null && !attachmentId.isEmpty()) {
             SObject[] attachments = (SObject[]) req.getAttribute(ATTR_KEY_ATTACHMENTS);
             if (attachments == null) {
                 attachments = queryAttachments(attachmentId);
+                req.setAttribute(ATTR_KEY_ATTACHMENTS, attachments);
             }
             SObject attachmentObj = findAttachmentById(attachments, attachmentId);
+            log.fine("attachmentObj != null ? " + (attachmentObj != null));
             printAttachmentBodyToResponse(attachmentObj, resp);
         }
 
@@ -79,42 +85,42 @@ public class AttachmentServlet extends HttpServlet {
 
     private void printAttachmentBodyToResponse(SObject attachmentObj, HttpServletResponse resp) throws IOException {
         if (resp != null) {
-            if (attachmentObj != null) {
-                ServletOutputStream out = resp.getOutputStream();
-                
-                out.println("<html>");
-                out.println("<head>");
-                out.println("<title>Attachment Content preview</title>");
-                out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"../stylesheet.css\" title=\"Style\">");
-                out.println("</head>");
-                
-                out.println("<body bgcolor=\"white\">");
-
-                out.println("<span class=\"bold\">Attachment content preview for Id: " + attachmentObj.getId() + "</span>");
-
-                byte[] bodyData = (byte[]) attachmentObj.getField("Body");
-                InputStream is = new ByteArrayInputStream(bodyData);
-                InputStreamReader reader = new InputStreamReader(is);
-                try {
-                    out.println("<pre id='content'>");
-                    int ln = 0;
-                    char[] chars = new char[1024];
-                    while((ln = reader.read(chars)) > 0) {
-                        out.print(JRStringUtil.xmlEncode(new String(chars, 0, ln)));
-                    }
-                    out.println("</pre>");
-                }
-                finally {
-                    reader.close();
-                    is.close();
-                    
-                    out.println("</body>");
-                    out.println("</html>");
-                    out.flush();
-                }
-                
-            } else {
+            if (attachmentObj == null) {
                 throw new RuntimeException("No Attachment found to display");
+            }
+            
+            ServletOutputStream out = resp.getOutputStream();
+            
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Attachment Content preview</title>");
+            out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"../stylesheet.css\" title=\"Style\">");
+            out.println("</head>");
+            
+            out.println("<body bgcolor=\"white\">");
+
+            out.println("<span class=\"bold\">Attachment content preview for Id: " + attachmentObj.getId() + "</span>");
+
+            byte[] bodyData = (byte[]) attachmentObj.getField("Body");
+            log.info(bodyData != null ? "Attachment.Body.length: " + bodyData.length : "Attachment.Body is null");
+            InputStream is = new ByteArrayInputStream(bodyData);
+            InputStreamReader reader = new InputStreamReader(is);
+            try {
+                out.println("<pre id='content'>");
+                int ln = 0;
+                char[] chars = new char[1024];
+                while((ln = reader.read(chars)) > 0) {
+                    out.print(JRStringUtil.xmlEncode(new String(chars, 0, ln)));
+                }
+                out.println("</pre>");
+            }
+            finally {
+                reader.close();
+                is.close();
+                
+                out.println("</body>");
+                out.println("</html>");
+                out.flush();
             }
         }
     }
