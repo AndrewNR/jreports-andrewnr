@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -127,7 +128,8 @@ public class AttachmentServlet extends HttpServlet {
             try {
                 String docGenProcessStreamUrl = new StringBuilder("https://").append(req.getServerName()).append("/DocGen/processStream").toString();
                 log.info("URL: " + docGenProcessStreamUrl);
-                URLConnection con = new URL(docGenProcessStreamUrl).openConnection();
+                HttpURLConnection con = (HttpURLConnection) new URL(docGenProcessStreamUrl).openConnection();
+                con.setRequestMethod("POST");
                 con.setDoOutput(true);
                 conOutput = con.getOutputStream();
                 conOutput.write(bodyBytes);
