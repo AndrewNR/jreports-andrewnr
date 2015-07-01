@@ -85,11 +85,16 @@ public class AttachmentServlet extends HttpServlet {
                 byte[] bodyData = (byte[]) attachmentObj.getField("Body");
                 InputStream is = new ByteArrayInputStream(bodyData);
                 InputStreamReader reader = new InputStreamReader(is);
-
-                int ln = 0;
-                char[] chars = new char[1024];
-                while((ln = reader.read(chars)) > 0) {
-                    out.print(JRStringUtil.xmlEncode(new String(chars, 0, ln)));
+                try {
+                    int ln = 0;
+                    char[] chars = new char[1024];
+                    while((ln = reader.read(chars)) > 0) {
+                        out.print(JRStringUtil.xmlEncode(new String(chars, 0, ln)));
+                    }
+                } finally {
+                    reader.close();
+                    is.close();
+                    out.flush();
                 }
             } else {
                 throw new RuntimeException("No Attachment found to display");
