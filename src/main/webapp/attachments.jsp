@@ -15,7 +15,8 @@
     <% for (SObject attachment : attachments) { %>
         <li>Id: <%=(String)attachment.getField("Id")%>,
         Name: <%= (String)attachment.getField("Name") %>.
-        <a href="/attachments/viewContent?id=<%=(String)attachment.getField("Id")%>" target="_blank">view content</a></li>
+        <a href="/attachments/viewContent?id=<%=(String)attachment.getField("Id")%>" target="_blank">view content</a>,
+        <a href="/attachments/runReport?id=<%=(String)attachment.getField("Id")%>" target="_blank">run Jasper Report</a></li>
     <% } %>
     </ol>
 <% } %>

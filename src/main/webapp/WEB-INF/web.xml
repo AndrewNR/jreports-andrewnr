@@ -132,10 +132,6 @@
 	
 	<servlet-mapping>
 		<servlet-name>DocGenServlet</servlet-name>
-		<url-pattern>/docGen</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>DocGenServlet</servlet-name>
 		<url-pattern>/docGen/*</url-pattern>
 	</servlet-mapping>
 

@@ -5,6 +5,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -26,6 +30,7 @@ import net.sf.jasperreports.engine.util.JRStringUtil;
 
 import org.andrewnr.oauth.service.ConnectionManager;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.util.IOUtils;
 
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.QueryResult;
@@ -45,6 +50,11 @@ public class AttachmentServlet extends HttpServlet {
         try {
             if (pathInfo != null && pathInfo.endsWith("/viewContent")) {
                 viewContent(req, resp);
+                return;
+            }
+            
+            if (pathInfo != null && pathInfo.endsWith("/runReport")) {
+                runReport(req, resp);
                 return;
             }
             
@@ -70,7 +80,7 @@ public class AttachmentServlet extends HttpServlet {
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/attachments.jsp");
         dispatcher.forward(req, resp);
     }
-
+    
     private void viewContent(HttpServletRequest req, HttpServletResponse resp) throws ConnectionException, IOException {
         log.info("----> viewContent() action");
         String attachmentId = req.getParameter("id");
@@ -85,35 +95,66 @@ public class AttachmentServlet extends HttpServlet {
             log.info(attachments != null ? "attachments.length: " + attachments.length : "attachments is null");
             SObject attachmentObj = findAttachmentById(attachments, attachmentId);
             log.info("attachmentObj != null ? " + (attachmentObj != null));
-            printAttachmentBodyToResponse(attachmentObj, resp);
+            byte[] bodyBytes = getAttachmentBodyBytes(attachmentObj);
+            printAttachmentBodyToResponse(bodyBytes, resp);
         }
-
+    }
+    
+    private void runReport(HttpServletRequest req, HttpServletResponse resp) throws ConnectionException, IOException {
+        log.info("----> runReport() action");
+        String attachmentId = req.getParameter("id");
+        log.info("attachmentId: " + attachmentId);
+        if (attachmentId != null && !attachmentId.isEmpty()) {
+            SObject[] attachments = (SObject[]) req.getAttribute(ATTR_KEY_ATTACHMENTS);
+            if (attachments == null) {
+                log.info("No attachments found in attribute, queryAttachments...");
+                attachments = queryAttachments(attachmentId);
+                req.setAttribute(ATTR_KEY_ATTACHMENTS, attachments);
+            }
+            log.info(attachments != null ? "attachments.length: " + attachments.length : "attachments is null");
+            SObject attachmentObj = findAttachmentById(attachments, attachmentId);
+            log.info("attachmentObj != null ? " + (attachmentObj != null));
+            byte[] bodyBytes = getAttachmentBodyBytes(attachmentObj);
+            sendReportToDocGen(bodyBytes);
+        }
+    }
+    
+    private void sendReportToDocGen(byte[] bodyBytes) throws MalformedURLException, IOException {
+        OutputStream conOutput = null;
+        try {
+            URLConnection con = new URL("/DocGen/processStream").openConnection();
+            con.setDoOutput(true);
+            conOutput = con.getOutputStream();
+            conOutput.write(bodyBytes);
+            conOutput.flush();
+        } finally {
+            IOUtils.closeQuietly(conOutput);
+        }
     }
 
-    private void printAttachmentBodyToResponse(SObject attachmentObj, HttpServletResponse resp) throws IOException {
+    private void printAttachmentBodyToResponse(byte[] bodyBytes, HttpServletResponse resp) throws IOException {
         if (resp != null) {
-            if (attachmentObj == null) {
-                throw new RuntimeException("No Attachment found to display");
+            if (bodyBytes == null) {
+                throw new RuntimeException("No Attachment Body found to display");
             }
             
+            log.info("Attachment.Body.length: " + bodyBytes.length);
+            
+            resp.setContentType("text/html");
             ServletOutputStream out = resp.getOutputStream();
             
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Attachment Content preview</title>");
-            out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"../stylesheet.css\" title=\"Style\">");
-            out.println("</head>");
-            
-            out.println("<body bgcolor=\"white\">");
-
-            out.println("<span class=\"bold\">Attachment content preview for Id: " + attachmentObj.getId() + "</span>");
-
-            String bodyDataBase64 = (String) attachmentObj.getField("Body");
-            byte[] bodyData = DatatypeConverter.parseBase64Binary(bodyDataBase64);
-            log.info(bodyData != null ? "Attachment.Body.length: " + bodyData.length : "Attachment.Body is null");
-            InputStream is = new ByteArrayInputStream(bodyData);
-            InputStreamReader reader = new InputStreamReader(is);
+            InputStream is = null;
+            InputStreamReader reader = null;
             try {
+                out.println("<html>");
+                out.println("<head>");
+                out.println("<title>Attachment Content preview</title>");
+                out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"../stylesheet.css\" title=\"Style\">");
+                out.println("</head>");
+                out.println("<body bgcolor=\"white\">");
+                out.println("<span class=\"bold\">Attachment content preview</span>");
+                is = new ByteArrayInputStream(bodyBytes);
+                reader = new InputStreamReader(is);
                 out.println("<pre id='content'>");
                 int ln = 0;
                 char[] chars = new char[1024];
@@ -123,9 +164,8 @@ public class AttachmentServlet extends HttpServlet {
                 out.println("</pre>");
             }
             finally {
-                reader.close();
-                is.close();
-                
+                IOUtils.closeQuietly(reader);
+                IOUtils.closeQuietly(is);
                 out.println("</body>");
                 out.println("</html>");
                 out.flush();
@@ -133,7 +173,16 @@ public class AttachmentServlet extends HttpServlet {
         }
     }
 
-    private SObject findAttachmentById(SObject[] attachments, String attachmentId) {
+    private static byte[] getAttachmentBodyBytes(SObject attachmentObj) {
+        byte[] bodyData = null;
+        if (attachmentObj != null) {
+            String bodyDataBase64 = (String) attachmentObj.getField("Body");
+            bodyData = bodyDataBase64 != null ? DatatypeConverter.parseBase64Binary(bodyDataBase64) : null;
+        }
+        return bodyData;
+    }
+
+    private static SObject findAttachmentById(SObject[] attachments, String attachmentId) {
         SObject result = null;
         if (attachments != null && attachmentId != null) {
             for (SObject attachment : attachments) {
@@ -147,7 +196,7 @@ public class AttachmentServlet extends HttpServlet {
         return result;
     }
 
-    private SObject[] queryAttachments(String parentId) throws ConnectionException {
+    private static SObject[] queryAttachments(String parentId) throws ConnectionException {
         PartnerConnection connection = ConnectionManager.getConnectionManager().getConnection();
         Set<String> neededFields = new HashSet<String>(Arrays.asList("Id", "Name", "BodyLength", "Description", "Body",
                 "ContentType", "LastModifiedDate", "LastModifiedById", "IsPrivate", "IsDeleted", "ParentId"));
