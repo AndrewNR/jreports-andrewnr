@@ -75,13 +75,13 @@ public class AttachmentServlet extends HttpServlet {
         if (attachmentId != null && !attachmentId.isEmpty()) {
             SObject[] attachments = (SObject[]) req.getAttribute(ATTR_KEY_ATTACHMENTS);
             if (attachments == null) {
-                log.fine("No attachments found in attribute, queryAttachments...");
+                log.info("No attachments found in attribute, queryAttachments...");
                 attachments = queryAttachments(attachmentId);
                 req.setAttribute(ATTR_KEY_ATTACHMENTS, attachments);
             }
-            log.fine(attachments != null ? "attachments.length: " + attachments.length : "attachments is null");
+            log.info(attachments != null ? "attachments.length: " + attachments.length : "attachments is null");
             SObject attachmentObj = findAttachmentById(attachments, attachmentId);
-            log.fine("attachmentObj != null ? " + (attachmentObj != null));
+            log.info("attachmentObj != null ? " + (attachmentObj != null));
             printAttachmentBodyToResponse(attachmentObj, resp);
         }
 
@@ -131,9 +131,10 @@ public class AttachmentServlet extends HttpServlet {
 
     private SObject findAttachmentById(SObject[] attachments, String attachmentId) {
         SObject result = null;
-        if (attachments != null) {
+        if (attachments != null && attachmentId != null) {
             for (SObject attachment : attachments) {
-                if (attachment.getId() == attachmentId) {
+                String id = attachment.getId();
+                if (id != null && (id.equalsIgnoreCase(attachmentId) || id.startsWith(attachmentId))) {
                     result = attachment;
                     break;
                 }
