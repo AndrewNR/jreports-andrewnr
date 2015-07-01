@@ -82,20 +82,37 @@ public class AttachmentServlet extends HttpServlet {
             if (attachmentObj != null) {
                 ServletOutputStream out = resp.getOutputStream();
                 
+                out.println("<html>");
+                out.println("<head>");
+                out.println("<title>Attachment Content preview</title>");
+                out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"../stylesheet.css\" title=\"Style\">");
+                out.println("</head>");
+                
+                out.println("<body bgcolor=\"white\">");
+
+                out.println("<span class=\"bold\">Attachment content preview for Id: " + attachmentObj.getId() + "</span>");
+
                 byte[] bodyData = (byte[]) attachmentObj.getField("Body");
                 InputStream is = new ByteArrayInputStream(bodyData);
                 InputStreamReader reader = new InputStreamReader(is);
                 try {
+                    out.println("<pre id='content'>");
                     int ln = 0;
                     char[] chars = new char[1024];
                     while((ln = reader.read(chars)) > 0) {
                         out.print(JRStringUtil.xmlEncode(new String(chars, 0, ln)));
                     }
-                } finally {
+                    out.println("</pre>");
+                }
+                finally {
                     reader.close();
                     is.close();
+                    
+                    out.println("</body>");
+                    out.println("</html>");
                     out.flush();
                 }
+                
             } else {
                 throw new RuntimeException("No Attachment found to display");
             }
