@@ -217,19 +217,16 @@ public class AttachmentServlet extends HttpServlet {
             log.info("queriedAttachments != null ? = " + (attachments != null));
             if (attachments != null && attachments.length > 0) {
                 log.info("# of attachments found for attachmentId='" + attachmentId + "': " + attachments.length);
-                bodyData = extractBodyBytes(attachments[0]);
+                bodyData = extractBodyBytes((String) attachments[0].getField("Body"));
             }
         }
         log.info("----> queryAttachmentBodyBytes() end");
         return bodyData;
     }
 
-    private static byte[] extractBodyBytes(SObject attachmentWithBodyField) {
-        byte[] bodyData;
-        String bodyDataBase64 = (String) attachmentWithBodyField.getField("Body");
+    private static byte[] extractBodyBytes(String bodyDataBase64) {
         log.info("attachmentBody(base64 encoded): " + bodyDataBase64);
-        bodyData = (bodyDataBase64 != null) ? DatatypeConverter.parseBase64Binary(bodyDataBase64) : null;
-        return bodyData;
+        return (bodyDataBase64 != null) ? DatatypeConverter.parseBase64Binary(bodyDataBase64) : null;
     }
 
     private static SObject findAttachmentById(SObject[] attachments, String attachmentId) {
