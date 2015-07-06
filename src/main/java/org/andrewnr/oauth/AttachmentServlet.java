@@ -36,6 +36,7 @@ import org.apache.poi.util.IOUtils;
 
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.QueryResult;
+import com.sforce.soap.partner.SaveResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 
@@ -97,7 +98,7 @@ public class AttachmentServlet extends HttpServlet {
             log.info(attachments != null ? "attachments.length: " + attachments.length : "attachments is null");
             SObject attachmentObj = findAttachmentById(attachments, attachmentId);
             log.info("attachmentObj != null ? " + (attachmentObj != null));
-            byte[] bodyBytes = getAttachmentBodyBytes(attachmentObj);
+            byte[] bodyBytes = queryAttachmentBodyBytes(attachmentObj);
             printAttachmentBodyToResponse(bodyBytes, resp);
         }
     }
@@ -116,7 +117,7 @@ public class AttachmentServlet extends HttpServlet {
             log.info(attachments != null ? "attachments.length: " + attachments.length : "attachments is null");
             SObject attachmentObj = findAttachmentById(attachments, attachmentId);
             log.info("attachmentObj != null ? " + (attachmentObj != null));
-            byte[] bodyBytes = getAttachmentBodyBytes(attachmentObj);
+            byte[] bodyBytes = queryAttachmentBodyBytes(attachmentObj);
             sendReportToDocGen(bodyBytes, req, resp);
         }
     }
@@ -209,11 +210,16 @@ public class AttachmentServlet extends HttpServlet {
         }
     }
 
-    private static byte[] getAttachmentBodyBytes(SObject attachmentObj) {
+    private static byte[] queryAttachmentBodyBytes(SObject attachmentObj) throws ConnectionException {
         byte[] bodyData = null;
         if (attachmentObj != null) {
-            String bodyDataBase64 = (String) attachmentObj.getField("Body");
-            bodyData = bodyDataBase64 != null ? DatatypeConverter.parseBase64Binary(bodyDataBase64) : null;
+            PartnerConnection connection = ConnectionManager.getConnectionManager().getConnection();
+            SObject[] attachments = connection.retrieve("Id, Name, Body", "Attachment", new String[] { attachmentObj.getId() });
+            if (attachments != null && attachments.length > 0) {
+                SObject attachmentWithBodyField = attachments[0];
+                String bodyDataBase64 = (String) attachmentWithBodyField.getField("Body");
+                bodyData = (bodyDataBase64 != null) ? DatatypeConverter.parseBase64Binary(bodyDataBase64) : null;
+            }
         }
         return bodyData;
     }
@@ -234,7 +240,15 @@ public class AttachmentServlet extends HttpServlet {
 
     private static SObject[] queryAttachments(String parentId) throws ConnectionException {
         PartnerConnection connection = ConnectionManager.getConnectionManager().getConnection();
-        Set<String> neededFields = new HashSet<String>(Arrays.asList("Id", "Name", "BodyLength", "Description", "Body",
+        
+        /*
+         * Avoid querying Body field: you can't receive the Body field for multiple records in a single query() call.
+         * If your query returns the Body field, your client application must ensure
+         * that only one row with one Attachment is returned; otherwise, an error occurs.
+         * A more effective approach is to return IDs (but not Attachment records in the Body field)
+         * from a query() call and then pass them into retrieve() calls that return the Body field.
+        */
+        Set<String> neededFields = new HashSet<String>(Arrays.asList("Id", "Name", "BodyLength", "Description",
                 "ContentType", "LastModifiedDate", "LastModifiedById", "IsPrivate", "IsDeleted", "ParentId"));
         List<String> availableFields = new ArrayList<String>(neededFields);
         log.info("availableFields: " + availableFields.toString());
@@ -248,4 +262,38 @@ public class AttachmentServlet extends HttpServlet {
         return records;
     }
 
+    private static void doCreateAttachment() {
+        String parentId = "";
+        String name = "";
+        String contentType = "jasper";
+        byte[] bodyBytes = new byte[0];
+        
+        SObject myNewAttachment = buildAttachment(parentId, name, contentType, bodyBytes);
+        insertAttachment(myNewAttachment);
+
+    }
+
+    private static Boolean insertAttachment(SObject attachment) {
+        Boolean result = false;
+        if (attachment != null) {
+            try {
+                PartnerConnection connection = ConnectionManager.getConnectionManager().getConnection();
+                SaveResult[] saveResults = connection.create(new SObject[] { attachment });
+                result = true;
+                for (SaveResult saveResult : saveResults) {
+                    if (!saveResult.isSuccess()) {
+                        result = false;
+                    }
+                }
+            } catch (ConnectionException e) {
+                log.severe("Error while inserting attachment: " + e.getMessage());
+            }
+        }
+        return result;
+    }
+
+    private static SObject buildAttachment(String parentId, String name, String contentType, byte[] bodyBytes) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
