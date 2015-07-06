@@ -1,6 +1,5 @@
 package org.andrewnr.oauth;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -10,9 +9,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -211,16 +207,28 @@ public class AttachmentServlet extends HttpServlet {
     }
 
     private static byte[] queryAttachmentBodyBytes(SObject attachmentObj) throws ConnectionException {
+        log.info("----> queryAttachmentBodyBytes() start");
         byte[] bodyData = null;
+        log.info("attachmentObj != null ? = " + (attachmentObj != null));
         if (attachmentObj != null) {
+            String attachmentId = attachmentObj.getId();
             PartnerConnection connection = ConnectionManager.getConnectionManager().getConnection();
-            SObject[] attachments = connection.retrieve("Id, Name, Body", "Attachment", new String[] { attachmentObj.getId() });
+            SObject[] attachments = connection.retrieve("Id, Name, Body", "Attachment", new String[] { attachmentId });
+            log.info("queriedAttachments != null ? = " + (attachments != null));
             if (attachments != null && attachments.length > 0) {
-                SObject attachmentWithBodyField = attachments[0];
-                String bodyDataBase64 = (String) attachmentWithBodyField.getField("Body");
-                bodyData = (bodyDataBase64 != null) ? DatatypeConverter.parseBase64Binary(bodyDataBase64) : null;
+                log.info("# of attachments found for attachmentId='" + attachmentId + "': " + attachments.length);
+                bodyData = extractBodyBytes(attachments[0]);
             }
         }
+        log.info("----> queryAttachmentBodyBytes() end");
+        return bodyData;
+    }
+
+    private static byte[] extractBodyBytes(SObject attachmentWithBodyField) {
+        byte[] bodyData;
+        String bodyDataBase64 = (String) attachmentWithBodyField.getField("Body");
+        log.info("attachmentBody(base64 encoded): " + bodyDataBase64);
+        bodyData = (bodyDataBase64 != null) ? DatatypeConverter.parseBase64Binary(bodyDataBase64) : null;
         return bodyData;
     }
 
