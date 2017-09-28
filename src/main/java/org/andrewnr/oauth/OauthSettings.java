@@ -12,10 +12,10 @@ import java.util.Map;
 public class OauthSettings {
     
     // Environment config keys
-    public static final String ENV_HOST = "env.HOST";
-    public static final String ENV_OAUTH_URL_CALLBACK = "env.OAUTH_URL_CALLBACK";
-    public static final String ENV_OAUTH_CONSUMER_KEY = "env.OAUTH_CONSUMER_KEY";
-    public static final String ENV_OAUTH_CONSUMER_SECRET = "env.OAUTH_CONSUMER_SECRET";
+    public static final String ENV_HOST = "SFDC_HOST";
+    public static final String ENV_OAUTH_URL_CALLBACK = "OAUTH_URL_CALLBACK";
+    public static final String ENV_OAUTH_CONSUMER_KEY = "OAUTH_CONSUMER_KEY";
+    public static final String ENV_OAUTH_CONSUMER_SECRET = "OAUTH_CONSUMER_SECRET";
 
     // URLs used by the application - change to test.salesforce.com for sandboxes
     public static String HOST = "https://login.salesforce.com";

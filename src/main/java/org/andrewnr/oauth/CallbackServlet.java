@@ -3,7 +3,6 @@ package org.andrewnr.oauth;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,9 +32,8 @@ public class CallbackServlet extends HttpServlet {
     try {
 
       String oauthToken = (String) req.getParameter(OAuth.OAUTH_TOKEN);
-      String oauthConsumerKey = (String) req
-          .getParameter(OAuth.OAUTH_CONSUMER_KEY);
-      String oauthVerifier = (String) req.getParameter("oauth_verifier");
+      String oauthConsumerKey = (String) req.getParameter(OAuth.OAUTH_CONSUMER_KEY);
+      String oauthVerifier = (String) req.getParameter(OAuth.OAUTH_VERIFIER);
 
       log.info("oauthToken=" + oauthToken);
       log.info("oauthConsumerKey=" + oauthConsumerKey);

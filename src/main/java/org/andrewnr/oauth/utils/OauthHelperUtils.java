@@ -91,39 +91,6 @@ public class OauthHelperUtils {
     }
   }
 
-  // requests a new session from salesforce using the login url
-  public static String getNewSfdcSession(OAuthAccessor accessor, String loginUrl) {
-    
-    HashMap<String, String> parameters = new HashMap<String, String>();
-    try {
-      
-      OAuthMessage m = accessor.newRequestMessage("POST", loginUrl, parameters
-          .entrySet());
-      
-      URL endpoint = new URL(loginUrl);
-      HttpURLConnection connection = (HttpURLConnection) endpoint.openConnection();
-      connection.setRequestMethod("POST");
-      connection.setDoOutput(true);
-      
-      String urlParameters = OAuth.addParameters(m.URL, m.getParameters());
-      String params = urlParameters.split("\\?")[1];
-
-      log.info("POSTing session request to=" + loginUrl);
-      log.info("Using OAuth parameters=" + params);
-
-      OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-      writer.write(params);
-      writer.close();
-
-      log.info("Response code=" + connection.getResponseCode());
-      return readInputStream(connection.getInputStream());
-
-    } catch (Exception e) {
-      return e.getMessage();
-    }
-    
-  }
-
   // builds the url for the authorizatin reqeust
   public static String buildAuthorizationUrl(OAuthAccessor accessor,
       String authPage) throws Exception {
@@ -139,45 +106,62 @@ public class OauthHelperUtils {
     return sb.toString();
     
   }
-  
-  // performs a GET request for tokens
-  public static String doOauthGetRequest(OAuthAccessor accessor,
-      String loginUrl, HashMap<String, String> parameters) throws Exception {
-    
-    OAuthMessage m = accessor.newRequestMessage("GET", loginUrl, parameters
-        .entrySet());
-    
-    String urlParameters = OAuth.addParameters(m.URL, m.getParameters());
 
-    log.info("GETting request to=" + urlParameters);
+
+  // requests a new session from salesforce using the login url
+  public static String getNewSfdcSession(OAuthAccessor accessor, String loginUrl) {
+    Map<String, String> parameters = new HashMap<String, String>();
+    try {
+      OAuthMessage oauthMsg = accessor.newRequestMessage("POST", loginUrl, parameters.entrySet());
+      String urlParameters = OAuth.addParameters(oauthMsg.URL, oauthMsg.getParameters());
+      
+      log.info("POST session request to=" + loginUrl);
+      URL endpoint = new URL(loginUrl);
+      HttpURLConnection connection = (HttpURLConnection) endpoint.openConnection();
+      connection.setRequestMethod("POST");
+      connection.setDoOutput(true);
+      
+      String params = urlParameters.split("\\?")[1];
+      log.info("Using OAuth parameters=" + params);
+      OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+      writer.write(params);
+      writer.close();
+
+      log.info("Response code=" + connection.getResponseCode());
+      return readInputStream(connection.getInputStream());
+    } catch (Exception e) {
+      return e.getMessage();
+    }
+  }
+
+  // performs a GET request for tokens
+  public static String doOauthGetRequest(OAuthAccessor accessor, String loginUrl, Map<String, String> parameters) throws Exception {
     
+    OAuthMessage oauthMsg = accessor.newRequestMessage("GET", loginUrl, parameters.entrySet());
+    String urlParameters = OAuth.addParameters(oauthMsg.URL, oauthMsg.getParameters());
+
+    log.info("GET request to=" + urlParameters);
     URL endpoint = new URL(urlParameters);
-    HttpURLConnection connection = (HttpURLConnection) endpoint
-        .openConnection();
+    HttpURLConnection connection = (HttpURLConnection) endpoint.openConnection();
     connection.setRequestMethod("GET");
     connection.setDoOutput(true);
 
     log.info("Response code=" + connection.getResponseCode());
     return readInputStream(connection.getInputStream());
-    
   }
   
   // reads the input stream
   public static String readInputStream(InputStream input) {
-    
     StringBuilder sb = new StringBuilder();
     BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-
     try {
       String line = reader.readLine();
       while (line != null) {
         sb.append(line + "\n");
         line = reader.readLine();
       }
-      
     } catch (IOException e) {
       log.severe("Error reading input stream=" + e.toString());
-      
     } finally {
       try {
         input.close();
@@ -186,31 +170,25 @@ public class OauthHelperUtils {
       }
     }
     return sb.toString().trim();
-    
   }
 
   // parses the params from the response
   public static HashMap<String, String> parseResponseParams(String body)
       throws Exception {
-    
     HashMap<String, String> results = new HashMap<String, String>();
     for (String keyValuePair : body.split("&")) {
       String[] kvp = keyValuePair.split("=");
       results.put(kvp[0], URLDecoder.decode(kvp[1], "UTF-8"));
     }
     return results;
-    
   }
 
   // parses xml returned in the resonse
   public static XmlResponseHandler parseResponse(String response)
       throws Exception {
-    
     XmlResponseHandler handler = new XmlResponseHandler();
-    PARSER.newSAXParser().parse(
-        new ByteArrayInputStream(response.getBytes()), handler);
+    PARSER.newSAXParser().parse(new ByteArrayInputStream(response.getBytes()), handler);
     return handler;
-    
   }
 
   // Inner class to hanlde returned XML response from Salesforce 

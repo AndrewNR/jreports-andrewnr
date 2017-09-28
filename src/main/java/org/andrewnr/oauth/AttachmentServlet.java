@@ -209,7 +209,7 @@ public class AttachmentServlet extends HttpServlet {
     private static byte[] queryAttachmentBodyBytes(SObject attachmentObj) throws ConnectionException {
         log.info("----> queryAttachmentBodyBytes() start");
         byte[] bodyData = null;
-        log.info("attachmentObj != null ? = " + (attachmentObj != null));
+        log.info("attachmentObj != null ? " + (attachmentObj != null));
         if (attachmentObj != null) {
             String attachmentId = attachmentObj.getId();
             PartnerConnection connection = ConnectionManager.getConnectionManager().getConnection();

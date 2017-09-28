@@ -26,8 +26,10 @@ public class LoginServlet extends HttpServlet {
         
         // Reinit config from ENV variables before processing the Login
         OauthSettings.initConfig();
-        String oauthCallbackUrlPath = new StringBuilder("https://").append(req.getServerName()).append("/callback").toString();
-        log.info("oauthCallbackUrlPath: 'https://' + req.getServerName() + '/callback' = " + oauthCallbackUrlPath);
+        String oauthCallbackUrlPath = new StringBuilder("https://").append(req.getServerName())
+                .append(req.getContextPath())
+                .append("/callback").toString();
+        log.info("oauthCallbackUrl: 'https://{serverName}{contextPath}/callback' = " + oauthCallbackUrlPath);
         
         log.info("OauthSettings.HOST: " + OauthSettings.HOST);
         log.info("OauthSettings.URL_CALLBACK: " + OauthSettings.URL_CALLBACK);
@@ -42,7 +44,7 @@ public class LoginServlet extends HttpServlet {
 
         log.info("Request token=" + accessor.requestToken);
         log.info("Request token secret=" + accessor.tokenSecret);
-        log.info("Resonse=" + response);
+        log.info("Response=" + response);
 
         // see if the token request failed
         if (response.startsWith("<")) {

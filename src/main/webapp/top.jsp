@@ -2,8 +2,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>Heroku-andrewnr-oauth :: OAuth Demo</title>
+    <title>JasperReports DocGen application</title>
   </head>
-
   <body>
-    <h1>OAuth Demo</h1>
+    <h1>Document Generation</h1>
